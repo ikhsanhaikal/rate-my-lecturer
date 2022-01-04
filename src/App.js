@@ -1,23 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { Box, useMediaQuery } from "@chakra-ui/react";
+import { useState } from "react";
+import MiniHeader from "./MiniHeader";
+import MiniSearch from "./MiniSearch";
+import SearchBar from "./SearchBar";
 
 function App() {
+  const [below500] = useMediaQuery("(max-width: 500px)");
+  const [isMiniSearchFocus, setIsMiniSearchFocus] = useState();
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {below500 ? (
+        <>
+          {/* <MiniHeader />
+          <Box
+            display="flex"
+            alignItems={"center"}
+            justifyContent={"center"}
+            border={"1px solid red"}
+          >
+            <SearchBar />
+          </Box> */}
+          <MiniSearch />
+        </>
+      ) : (
+        "nope"
+      )}
     </div>
   );
 }
