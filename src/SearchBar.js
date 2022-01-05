@@ -20,18 +20,17 @@ const Data = [
   { id: 8, name: "komputasi awan", department: "informatika", type: "s" },
 ];
 
-const SearchBar = () => {
+const SearchBar = ({ setIsMiniSearchFocus }) => {
   const [textInput, setTextInput] = useControllableState({
     defaultValue: "",
   });
   const [searchResult, setSearchResult] = useState([]);
-  const [isOnFocus, setIsOnFocus] = useState(false);
   const inputEl = useRef(null);
   return (
     <Box
       boxShadow="base"
       bgColor={"white"}
-      width={["xs", "sm", "md", "lg", "xl", "2xl"]}
+      width={["xs", "md", "lg", "xl", "2xl"]}
       borderRadius={searchResult.length === 0 ? 50 : 10}
     >
       <InputGroup>
@@ -52,7 +51,9 @@ const SearchBar = () => {
           }}
           borderRadius={"none"}
           border={"none"}
-          onFocus={() => {}}
+          onFocus={() => {
+            setIsMiniSearchFocus(true);
+          }}
           onBlur={() => setSearchResult([])}
           onChange={(e) => {
             setTextInput(e.target.value);
