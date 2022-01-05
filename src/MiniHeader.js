@@ -14,6 +14,7 @@ import {
 
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { useRef } from "react";
+import { BsGithub } from "react-icons/bs";
 
 const MiniHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -23,6 +24,7 @@ const MiniHeader = () => {
       display={"flex"}
       justifyContent={"space-between"}
       alignItems={"center"}
+      bg={"white"}
       px={4}
       py={2}
     >
@@ -32,41 +34,23 @@ const MiniHeader = () => {
         onClick={onOpen}
         _focus={{ outline: "none" }}
         _hover={{ boxShadow: "none" }}
+        p={0}
       >
         <Icon as={HamburgerIcon} fontSize={"2xl"} />
       </Button>
-      <Button bg={"white"}>Sign in</Button>
-
+      <Icon as={BsGithub} fontSize={"1.5rem"} />
       <Drawer
         isOpen={isOpen}
         placement="left"
         onClose={onClose}
         finalFocusRef={btnRef}
         size={"xs"}
+        border="1px solid red"
       >
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader textColor={"gray.800"}>Rating app</DrawerHeader>
-          <DrawerBody>
-            <VStack alignItems={"start"}>
-              <Text
-                fontWeight={"semibold"}
-                textColor={"gray.800"}
-                as={"button"}
-                _focus={{ outline: "none" }}
-              >
-                Home
-              </Text>
-              <Text
-                fontWeight={"semibold"}
-                textColor={"gray.800"}
-                as={"button"}
-                _focus={{ outline: "none" }}
-              >
-                Most Pick
-              </Text>
-            </VStack>
-          </DrawerBody>
+          <DrawerHeader></DrawerHeader>
+          <DrawerBody></DrawerBody>
         </DrawerContent>
       </Drawer>
     </Box>
