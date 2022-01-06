@@ -4,7 +4,7 @@ const SuggestionItem = ({ doc, setTextInput }) => {
   return (
     <Box
       m={2}
-      _hover={{ bg: "gray.200" }}
+      _hover={{ bg: "#f2f2f2" }}
       onClick={(e) => {
         setTextInput(doc.name);
       }}

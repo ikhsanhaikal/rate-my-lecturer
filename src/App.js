@@ -1,16 +1,13 @@
 import {
   Box,
-  Container,
   Flex,
   Tabs,
   TabList,
   TabPanels,
   Tab,
   TabPanel,
-  Text,
-  useMediaQuery,
   VStack,
-  Spacer,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import MiniHeader from "./MiniHeader";
@@ -54,7 +51,7 @@ function App() {
                       </TabList>
                       <TabPanels>
                         <TabPanel p={0} bg={"#F1F3F4"}>
-                          {Array(3)
+                          {Array(6)
                             .fill(0)
                             .map((n) => {
                               return <Item />;
