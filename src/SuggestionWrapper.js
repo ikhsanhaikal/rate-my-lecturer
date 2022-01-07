@@ -1,13 +1,13 @@
 import { Box } from "@chakra-ui/react";
 import SuggestionItem from "./SuggestionItem";
-const SuggestionWrapper = (props) => {
+const SuggestionWrapper = ({ documents, setTextInput }) => {
   return (
     <Box paddingBottom={1} paddingX={0}>
-      {props.documents.map((document) => (
+      {documents.map((document) => (
         <SuggestionItem
           key={document.id}
           doc={document}
-          setTextInput={props.setTextInput}
+          setTextInput={setTextInput}
         />
       ))}
     </Box>

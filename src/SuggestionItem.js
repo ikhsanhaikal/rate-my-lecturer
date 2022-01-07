@@ -13,7 +13,8 @@ const SuggestionItem = ({ doc, setTextInput }) => {
       }}
     >
       <Text fontSize={["xs"]} fontWeight={"semibold"}>
-        {doc.type === "l" ? "lecturer" : "subject"}
+        {/* {doc.type === "l" ? "lecturer" : "subject"} */}
+        {"lecturer"}
       </Text>
       <Text fontSize={"large"} fontWeight={"bold"} cursor={"default"}>
         {doc.name}

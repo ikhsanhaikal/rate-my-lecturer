@@ -13,18 +13,7 @@ import { useState } from "react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import SuggestionWrapper from "./SuggestionWrapper";
 
-const Data = [
-  { id: 1, name: "orange", department: "informatika", type: "l" },
-  { id: 2, name: "apple", department: "informatika", type: "l" },
-  { id: 3, name: "avocado", department: "informatika", type: "l" },
-  { id: 4, name: "pineapple", department: "informatika", type: "l" },
-  { id: 5, name: "struktur data", department: "informatika", type: "s" },
-  { id: 6, name: "dasar pemrograman", department: "informatika", type: "s" },
-  { id: 7, name: "sistem terdistribusi", department: "informatika", type: "s" },
-  { id: 8, name: "komputasi awan", department: "informatika", type: "s" },
-];
-
-const MiniSearch = ({ setIsMiniSearchFocus }) => {
+const MiniSearch = ({ setIsMiniSearchFocus, lecturers }) => {
   const [textInput, setTextInput] = useControllableState({
     defaultValue: "",
   });
@@ -34,7 +23,6 @@ const MiniSearch = ({ setIsMiniSearchFocus }) => {
       <InputGroup>
         <InputLeftElement
           onClick={() => {
-            console.log("return home");
             setIsMiniSearchFocus(false);
           }}
         >
@@ -51,14 +39,13 @@ const MiniSearch = ({ setIsMiniSearchFocus }) => {
           autoFocus={true}
           value={textInput}
           onChange={(e) => {
-            console.log(e.target.value);
             setTextInput(e.target.value);
             if (e.target.value === "") {
               setSearchResult([]);
             } else {
               setSearchResult(
-                Data.filter((data) => {
-                  return data.name.includes(e.target.value.toLowerCase());
+                lecturers.filter((lecturer) => {
+                  return lecturer.name.includes(e.target.value.toLowerCase());
                 })
               );
             }
@@ -67,7 +54,10 @@ const MiniSearch = ({ setIsMiniSearchFocus }) => {
       </InputGroup>
       <Spacer />
       {searchResult.length !== 0 ? (
-        <SuggestionWrapper documents={searchResult} />
+        <SuggestionWrapper
+          documents={searchResult}
+          setTextInput={setTextInput}
+        />
       ) : null}
     </Box>
   );

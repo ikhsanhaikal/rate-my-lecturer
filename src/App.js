@@ -14,16 +14,21 @@ import MiniHeader from "./MiniHeader";
 import MiniSearch from "./MiniSearch";
 import SearchBar from "./SearchBar";
 import Item from "./Item";
+import Data from "./db.json";
 
 function App() {
-  const below500 = useMediaQuery(["(max-width: 800px)"]);
+  const below800 = useMediaQuery(["(max-width: 800px)"]);
   const [isMiniSearchFocus, setIsMiniSearchFocus] = useState();
+  const [lecturers, setLecturers] = useState(Data.lecturers);
   return (
     <div className="App">
-      {below500[0]
+      {below800[0]
         ? [
             isMiniSearchFocus ? (
-              <MiniSearch setIsMiniSearchFocus={setIsMiniSearchFocus} />
+              <MiniSearch
+                setIsMiniSearchFocus={setIsMiniSearchFocus}
+                lecturers={lecturers}
+              />
             ) : (
               <Flex
                 p={0}
@@ -51,19 +56,18 @@ function App() {
                       </TabList>
                       <TabPanels>
                         <TabPanel p={0} bg={"#F1F3F4"}>
-                          {Array(6)
-                            .fill(0)
-                            .map((n) => {
-                              return <Item />;
-                            })}
+                          {lecturers.map((lecturer) => {
+                            return (
+                              <Item
+                                key={lecturer.name}
+                                doc={lecturer}
+                                lecturers={lecturers}
+                                setLecturers={setLecturers}
+                              />
+                            );
+                          })}
                         </TabPanel>
-                        <TabPanel p={0} bg={"#F1F3F4"}>
-                          {Array(2)
-                            .fill(0)
-                            .map((n) => {
-                              return <Item />;
-                            })}
-                        </TabPanel>
+                        <TabPanel p={0} bg={"#F1F3F4"}></TabPanel>
                       </TabPanels>
                     </Tabs>
                   </VStack>

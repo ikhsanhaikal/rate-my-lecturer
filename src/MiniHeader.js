@@ -7,9 +7,7 @@ import {
   DrawerOverlay,
   DrawerContent,
   Icon,
-  Text,
   useDisclosure,
-  VStack,
 } from "@chakra-ui/react";
 
 import { HamburgerIcon } from "@chakra-ui/icons";
