@@ -12,7 +12,7 @@ const Comment = ({ comment, setLecturers }) => {
         What is this? totally mehh
       </Text> */}
       <Text className="comment" textAlign={"start"} fontSize={"sm"} py={0}>
-        {comment.review}
+        {comment.body}
       </Text>
       <HStack justifyContent={"flex-end"}>
         <HStack>

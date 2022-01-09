@@ -17,9 +17,21 @@ import {
 import Comment from "./Comment";
 import Stars from "./Stars";
 import { v4 as uuidv4 } from "uuid";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-const LecturerView = ({ onClose, doc, lecturers, setLecturers }) => {
+const LecturerView = ({ onClose, doc }) => {
   const [textInput, setTextInput] = useControllableState("");
+  const [comments, setComments] = useState([]);
+
+  useEffect(async () => {
+    const resp = await axios.get(
+      `http://localhost:3001/comments?lecturerId=${doc.id}`
+    );
+    // console.log(`useEffect comments data `, resp.data);
+    setComments(resp.data);
+  }, []);
+
   return (
     <Box bgColor={"white"} width={"full"} h={"full"} overflowY={"scroll"}>
       <Box className="profile-image" bg={"gray.200"} h={["280px", "300px"]}>
@@ -78,18 +90,16 @@ const LecturerView = ({ onClose, doc, lecturers, setLecturers }) => {
         </Box>
         <Divider my={2} />
         <Box className="comments-container">
-          <Text>Reviews ({doc.comments.length})</Text>
-          {doc.comments.length !== 0
-            ? doc.comments.map((comment) => {
-                return (
-                  <Comment
-                    key={comment.id}
-                    comment={comment}
-                    updateComment={setLecturers}
-                  />
-                );
-              })
-            : null}
+          <Text>Reviews ({comments.length})</Text>
+          {comments.map((comment) => {
+            return (
+              <Comment
+                key={comment.id}
+                comment={comment}
+                updateComment={null}
+              />
+            );
+          })}
           <VStack textAlign={"start"} alignItems={"flex-end"} mt={10}>
             <Textarea
               placeholder="Write your comments here"
@@ -103,18 +113,19 @@ const LecturerView = ({ onClose, doc, lecturers, setLecturers }) => {
             <Button
               borderRadius={"none"}
               mt={3}
-              onClick={() => {
-                const newLecturers = lecturers.map((lecturer) => {
-                  if (lecturer.id === doc.id) {
-                    lecturer.comments.push({
-                      id: uuidv4(),
-                      name: "you",
-                      review: textInput,
-                    });
-                  }
-                  return lecturer;
-                });
-                setLecturers(newLecturers);
+              onClick={async () => {
+                const newComment = {
+                  name: "you",
+                  body: textInput,
+                  lecturerId: doc.id,
+                };
+                const resp = await axios.post(
+                  `http://localhost:3001/comments`,
+                  newComment
+                );
+                console.log(`comment post status: ${resp.status}`);
+                console.log(resp.data);
+                setComments([...comments, newComment]);
                 setTextInput("");
               }}
             >

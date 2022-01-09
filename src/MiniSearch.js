@@ -4,20 +4,30 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Slide,
   Spacer,
   useControllableState,
+  useDisclosure,
 } from "@chakra-ui/react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import SuggestionWrapper from "./SuggestionWrapper";
+import LecturerView from "./LecturerView";
 
 const MiniSearch = ({ setIsMiniSearchFocus, lecturers }) => {
   const [textInput, setTextInput] = useControllableState({
     defaultValue: "",
   });
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [searchResult, setSearchResult] = useState([]);
+  const [doc, setDoc] = useState({});
+
+  useEffect(() => {
+    onOpen();
+  }, [doc]);
+
   return (
     <Box h="full" px={4} py={4}>
       <InputGroup>
@@ -57,8 +67,20 @@ const MiniSearch = ({ setIsMiniSearchFocus, lecturers }) => {
         <SuggestionWrapper
           documents={searchResult}
           setTextInput={setTextInput}
+          setDoc={setDoc}
         />
       ) : null}
+      {Object.keys(doc).length === 0 ? null : (
+        <Slide direction="left" in={isOpen} style={{ zIndex: 10 }}>
+          <LecturerView
+            onClose={() => {
+              setDoc({});
+              onClose();
+            }}
+            doc={doc}
+          />
+        </Slide>
+      )}
     </Box>
   );
 };

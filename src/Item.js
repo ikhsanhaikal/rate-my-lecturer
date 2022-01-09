@@ -7,7 +7,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import LecturerView from "./LecturerView";
-const Item = ({ doc, lecturers, setLecturers }) => {
+const Item = ({ doc }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -41,12 +41,7 @@ const Item = ({ doc, lecturers, setLecturers }) => {
       </HStack>
 
       <Slide direction="left" in={isOpen} style={{ zIndex: 10 }}>
-        <LecturerView
-          onClose={onClose}
-          doc={doc}
-          lecturers={lecturers}
-          setLecturers={setLecturers}
-        />
+        <LecturerView onClose={onClose} doc={doc} />
       </Slide>
     </>
   );
