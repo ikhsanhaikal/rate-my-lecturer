@@ -1,24 +1,27 @@
 import { Box, Text } from "@chakra-ui/react";
 
-const SuggestionItem = ({ doc, setTextInput, onOpen, setDoc }) => {
+const SuggestionItem = ({ doc, setDoc }) => {
   return (
     <Box
       m={2}
       _hover={{ bg: "#f2f2f2" }}
       onClick={(e) => {
-        // setTextInput(doc.name);
         setDoc(doc);
       }}
       onPointerDown={(e) => {
         e.preventDefault();
       }}
+      maxW="2xl"
     >
       <Text fontSize={["xs"]} fontWeight={"semibold"}>
-        {/* {doc.type === "l" ? "lecturer" : "subject"} */}
         {"lecturer"}
       </Text>
-      <Text fontSize={"large"} fontWeight={"bold"} cursor={"default"}>
-        {doc.name}
+      <Text
+        fontSize={["md", "lg", "larger", "xl"]}
+        fontWeight={"bold"}
+        cursor={"default"}
+      >
+        {doc}
       </Text>
     </Box>
   );

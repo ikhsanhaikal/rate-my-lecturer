@@ -1,26 +1,23 @@
 import { Avatar, Box, HStack, Icon, Text } from "@chakra-ui/react";
-import { GoThumbsup, GoThumbsdown } from "react-icons/go";
+import { FiThumbsUp, FiThumbsDown } from "react-icons/fi";
 
-const Comment = ({ comment, setLecturers }) => {
+const Comment = ({ comment }) => {
   return (
-    <Box className="comment">
+    <Box className="comment" px={6} borderY={"1px"}>
       <HStack>
         <Avatar size={"sm"}></Avatar>
         <Text fontWeight={"medium"}>{comment.name}</Text>
       </HStack>
-      {/* <Text className="title" textAlign={"start"} fontWeight={"bold"} py={1}>
-        What is this? totally mehh
-      </Text> */}
       <Text className="comment" textAlign={"start"} fontSize={"sm"} py={0}>
         {comment.body}
       </Text>
       <HStack justifyContent={"flex-end"}>
         <HStack>
-          <Icon as={GoThumbsup} />
+          <Icon as={FiThumbsUp} />
           <Text fontSize={"sm"}>0</Text>
         </HStack>
         <HStack>
-          <Icon as={GoThumbsdown} />
+          <Icon as={FiThumbsDown} />
           <Text fontSize={"sm"}>0</Text>
         </HStack>
       </HStack>

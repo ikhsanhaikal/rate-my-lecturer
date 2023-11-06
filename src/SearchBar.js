@@ -6,39 +6,22 @@ import {
   InputLeftElement,
   useControllableState,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import SuggestionWrapper from "./SuggestionWrapper";
 
-const Data = [
-  { id: 1, name: "orange", department: "informatika", type: "l" },
-  { id: 2, name: "apple", department: "informatika", type: "l" },
-  { id: 3, name: "avocado", department: "informatika", type: "l" },
-  { id: 4, name: "pineapple", department: "informatika", type: "l" },
-  { id: 5, name: "struktur data", department: "informatika", type: "s" },
-  { id: 6, name: "dasar pemrograman", department: "informatika", type: "s" },
-  { id: 7, name: "sistem terdistribusi", department: "informatika", type: "s" },
-  { id: 8, name: "komputasi awan", department: "informatika", type: "s" },
-];
-
-const SearchBar = ({ setIsMiniSearchFocus }) => {
+const SearchBar = ({ setOnFocus = () => {} }) => {
   const [textInput, setTextInput] = useControllableState({
     defaultValue: "",
   });
-  const [searchResult, setSearchResult] = useState([]);
   const inputEl = useRef(null);
   return (
-    <Box
-      boxShadow="base"
-      bgColor={"white"}
-      width={["xs", "md", "lg", "xl", "2xl"]}
-      borderRadius={searchResult.length === 0 ? 50 : 10}
-    >
+    <CustomBox>
       <InputGroup>
-        <InputLeftElement m={1}>
-          <SearchIcon color={"gray.400"} />
+        <InputLeftElement my={1} mx={2}>
+          <SearchIcon color={"gray.400"} fontSize={["sm", "md"]} />
         </InputLeftElement>
         <Input
-          ml={2}
+          ml={3}
           placeholder="Search"
           ref={inputEl}
           size={"lg"}
@@ -49,38 +32,25 @@ const SearchBar = ({ setIsMiniSearchFocus }) => {
             borderRight: "none",
             borderTop: "none",
           }}
+          fontSize={["md", "lg"]}
           borderRadius={"none"}
           border={"none"}
-          onFocus={() => {
-            setIsMiniSearchFocus(true);
-          }}
-          onBlur={() => setSearchResult([])}
-          onChange={(e) => {
-            setTextInput(e.target.value);
-            if (e.target.value === "") {
-              setSearchResult([]);
-            } else {
-              setSearchResult(
-                Data.filter((data) => {
-                  return data.name.includes(e.target.value.toLowerCase());
-                })
-              );
-            }
-          }}
+          onBlur={() => {}}
+          onChange={(e) => {}}
+          onFocus={setOnFocus}
           value={textInput}
         />
       </InputGroup>
-      {searchResult.length === 0 ? null : (
-        <SuggestionWrapper
-          documents={searchResult}
-          setTextInput={(name) => {
-            inputEl.current.blur();
-            setTextInput(name);
-          }}
-        />
-      )}
-    </Box>
+    </CustomBox>
   );
 };
 
 export default SearchBar;
+
+function CustomBox(props) {
+  return (
+    <Box boxShadow="base" width={["xs"]} borderRadius={50} position="relative">
+      {props.children}
+    </Box>
+  );
+}

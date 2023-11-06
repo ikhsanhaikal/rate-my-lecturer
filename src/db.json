@@ -1,0 +1,139 @@
+{
+  "lecturers": [
+    {
+      "id": 1,
+      "name": "dwi sunaryono",
+      "expertise": "programming algorithm",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "tags": [
+        "tag1",
+        "tag3",
+        "tag7"
+      ],
+      "subjects": [
+        "struktur data",
+        "pemrograman berbasis antarmuka",
+        "sistem basis data",
+        "manajemen basis data"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "arya yudhi wijaya",
+      "expertise": "Applied Modeling and Computing",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag6"
+      ],
+      "subjects": [
+        "matematika diskrit",
+        "aljabar linear",
+        "teori graf dan otomata",
+        "probabilitas dan statistik"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "abdul munif",
+      "expertise": "intelligent infomation management",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
+      "tags": [
+        "tag2",
+        "tag5",
+        "tag6"
+      ],
+      "subjects": [
+        "big data",
+        "basis data terdistribusi",
+        "pemrograman web",
+        "struktur data"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "kelly rosa sungkono",
+      "expertise": "intelligent infomation management",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
+      "tags": [
+        "tag3",
+        "tag4"
+      ],
+      "subjects": [
+        "manajemen basis data",
+        "sistem basis data",
+        "analisis dan perancangan sistem informasi",
+        "manajemen proyek perangkat lunak"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "sarwosari",
+      "expertise": "software engineering",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
+      "tags": [
+        "tag1",
+        "tag5"
+      ],
+      "subjects": [
+        "manajemen basis data",
+        "sistem basis data",
+        "analisis dan perancangan sistem informasi",
+        "manajemen proyek perangkat lunak"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "wahyu suadi",
+      "expertise": "Architecture and Computer Networking",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
+      "tags": [
+        "tag6",
+        "tag7",
+        "tag8"
+      ],
+      "subjects": [
+        "sistem operasi",
+        "pemrograman jaringan",
+        "keamanan informasi dan jaringan",
+        "organisasi komputer"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "royyana muslim ijtihadie",
+      "expertise": "Architecture and Computer Networking",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
+      "tags": [
+        "tag2",
+        "tag3",
+        "tag8"
+      ],
+      "subjects": [
+        "sistem terdistribusi",
+        "komputasi awan",
+        "pemrograman jaringan",
+        "organisasi komputer"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "radityo anggoro",
+      "expertise": "Architecture and Computer Networking",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
+      "tags": [
+        "tag2",
+        "tag3",
+        "tag8"
+      ],
+      "subjects": [
+        "jaringan komputer",
+        "jaringan nirkabel"
+      ]
+    }  
+],
+  "comments": [
+
+  ]
+}
