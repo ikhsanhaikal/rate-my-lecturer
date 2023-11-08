@@ -12,14 +12,17 @@ import {
   useDisclosure,
   VStack,
   Flex,
+  useMediaQuery,
 } from "@chakra-ui/react";
 
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { useRef } from "react";
 import { BsFilterRight } from "react-icons/bs";
+import TagList from "./TagList";
 
 const MiniHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [below600] = useMediaQuery("(max-width: 650px)");
   return (
     <Box
       display={"flex"}
@@ -37,7 +40,10 @@ const MiniHeader = () => {
         px={2}
       >
         <Icon as={HamburgerIcon} fontSize={"2xl"} />
-        <Icon as={BsFilterRight} fontSize={"3xl"} onClick={onOpen} />
+        {below600 ? (
+          <Icon as={BsFilterRight} fontSize={"3xl"} onClick={onOpen} />
+        ) : null}
+
         <DrawerFilter isOpen={isOpen} onClose={onClose} />
       </Flex>
     </Box>
@@ -102,38 +108,17 @@ function DrawerFilter({ onClose, isOpen }) {
               <Text fontWeight={"bold"} pl={1} pb={1} fontSize={["xs", "sm"]}>
                 Subjects
               </Text>
-              <Tags tags={subjects} />
+              <TagList tags={subjects} />
             </Box>
             <Box>
               <Text fontWeight={"bold"} pl={1} pb={1} fontSize={["xs", "sm"]}>
                 Tags
               </Text>
-              <Tags tags={tags} />
+              <TagList tags={tags} />
             </Box>
           </VStack>
         </DrawerBody>
       </DrawerContent>
     </Drawer>
-  );
-}
-
-function Tags({ tags }) {
-  return (
-    <Box>
-      {tags.map((subject) => {
-        return (
-          <Tag
-            m={0.5}
-            p={2}
-            key={subject}
-            onClick={() => {}}
-            cursor={"pointer"}
-            fontSize={["xs", "sm"]}
-          >
-            {subject}
-          </Tag>
-        );
-      })}
-    </Box>
   );
 }

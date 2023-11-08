@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import SuggestionWrapper from "./SuggestionWrapper";
-import LecturerView from "./LecturerView";
+import LecturerView from "./Lecturer";
 
 const MiniSearch = ({ setOnFocus }) => {
   const [textInput, setTextInput] = useControllableState({

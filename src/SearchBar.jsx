@@ -49,7 +49,12 @@ export default SearchBar;
 
 function CustomBox(props) {
   return (
-    <Box boxShadow="base" width={["xs"]} borderRadius={50} position="relative">
+    <Box
+      boxShadow="base"
+      width={["xs", "s", "md", "xl"]}
+      borderRadius={50}
+      position="relative"
+    >
       {props.children}
     </Box>
   );

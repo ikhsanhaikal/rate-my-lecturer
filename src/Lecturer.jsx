@@ -15,11 +15,6 @@ import {
   Input,
   useDisclosure,
   Textarea,
-  InputGroup,
-  InputRightElement,
-} from "@chakra-ui/react";
-
-import {
   Drawer,
   DrawerBody,
   DrawerOverlay,
@@ -28,32 +23,53 @@ import {
 
 import Comment from "./Comment";
 import Stars from "./Stars";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-const LecturerView = ({ onClose, doc }) => {
+import { useLoaderData, useNavigate } from "react-router-dom";
+import data from "./db.json";
+
+function getLecturer(lecturerId) {
+  const { lecturers } = data;
+  const lecturer = lecturers.find(
+    (lecturer) => lecturer.id === parseInt(lecturerId)
+  );
+  return lecturer;
+}
+
+export function loader({ params }) {
+  const lecturer = getLecturer(params.lecturerId);
+  return { lecturer };
+}
+
+const Lecturer = ({ onClose, doc }) => {
+  const { lecturer } = useLoaderData();
+  const navigate = useNavigate();
   const [textInput, setTextInput] = useControllableState("");
   const [comments, setComments] = useState([]);
   const { isOpen, onOpen, onBlurFocus } = useDisclosure();
 
   return (
-    <Box bgColor={"white"} width={"full"} h={"full"} overflowY={"scroll"}>
+    <Box bgColor="white" width="full" h="full" overflowY="scroll">
       <Box className="profile-image" bg={"gray.200"} h={["200px", "300px"]}>
         <Flex px={4} py={4}>
           <IconButton
             icon={<ArrowBackIcon />}
-            onClick={onClose}
+            // onClick={onClose}
+            onClick={() => {
+              navigate(-1);
+            }}
             fontSize={"xl"}
             borderRadius={50}
           />
         </Flex>
       </Box>
-      <Box display={"flex"} flexDir={"column"} py={4} w="full">
+      <Box display="flex" flexDir="column" py="4" w="full">
         <Box px={3}>
           <Heading fontSize={["larger", "xl", "2xl"]} textAlign={"start"}>
-            {doc.name}
+            {lecturer.name}
           </Heading>
           <Text textAlign={"start"} fontWeight={"semibold"}>
-            expertise {"\u2022"} {doc.expertise}
+            expertise {"\u2022"} {lecturer.expertise}
           </Text>
           <Text
             textAlign={"start"}
@@ -61,7 +77,7 @@ const LecturerView = ({ onClose, doc }) => {
             pr={2}
             fontSize={["sm", "md", "lg", "xl"]}
           >
-            {doc.description}
+            {lecturer.description}
           </Text>
           <HStack spacing={"2.5"} justifyContent={"flex-start"} pb={4}>
             <Text fontSize={"sm"} textColor={"red.400"}>
@@ -70,7 +86,7 @@ const LecturerView = ({ onClose, doc }) => {
             <Stars total={3} />
           </HStack>
           <Box textAlign={"start"}>
-            {doc.tags.map((label) => {
+            {lecturer.tags.map((label) => {
               return (
                 <Tag key={label} m={0.5}>
                   {label}
@@ -89,7 +105,7 @@ const LecturerView = ({ onClose, doc }) => {
             subjects
           </Text>
           <Box textAlign={"start"}>
-            {doc.subjects.map((label) => {
+            {lecturer.subjects.map((label) => {
               return (
                 <Tag key={label} m={0.5}>
                   {label}
@@ -99,7 +115,7 @@ const LecturerView = ({ onClose, doc }) => {
           </Box>
           <Divider my={2} />
         </Box>
-        <Box>
+        {/* <Box>
           <Text textAlign={"start"} px={3}>
             Comments ({comments.length})
           </Text>
@@ -127,13 +143,13 @@ const LecturerView = ({ onClose, doc }) => {
               />
             );
           })}
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );
 };
 
-export default LecturerView;
+export default Lecturer;
 
 function CommentOnFocus({ isOpen, onBlurFocus }) {
   const [text, setText] = useState("");
