@@ -23,11 +23,12 @@ import {
 
 import Comment from "./Comment";
 import Stars from "./Stars";
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import data from "./db.json";
 import { gql, useQuery } from "@apollo/client";
+import ReviewModal from "./ReviewModal";
 
 function getLecturer(lecturerId) {
   const { lecturers } = data;
@@ -64,7 +65,9 @@ const Lecturer = () => {
   const navigate = useNavigate();
   const [textInput, setTextInput] = useControllableState("");
   const [comments, setComments] = useState([]);
-  const { isOpen, onOpen, onBlurFocus } = useDisclosure();
+  const { isOpen, onOpen, onBlurFocus, onClose } = useDisclosure();
+
+  const finalRef = React.useRef(null);
 
   if (loading) {
     return <p>loading...</p>;
@@ -107,9 +110,9 @@ const Lecturer = () => {
             fontSize={["sm", "md", "lg", "xl"]}
           ></Text>
           <HStack spacing={"2.5"} justifyContent={"flex-start"} pb={4}>
-            <Text fontSize={"sm"} textColor={"red.400"}>
+            {/* <Text fontSize={"sm"} textColor={"red.400"}>
               3.0
-            </Text>
+            </Text> */}
             <Stars total={3} />
           </HStack>
           <Box textAlign={"start"}>
@@ -146,18 +149,23 @@ const Lecturer = () => {
           <Text textAlign={"start"} px={3}>
             Comments ({comments.length})
           </Text>
-          <Flex alignItems="center" padding={3} columnGap={3}>
-            <Avatar size={"xs"}></Avatar>
+          <Flex alignItems="center" padding={3} columnGap={3} ref={finalRef}>
+            <Avatar size={["xs", "sm"]}></Avatar>
             <Input
               placeholder="Add a commment..."
               borderRadius={"none"}
               bg={"white"}
               value={textInput}
-              size={["sm"]}
-              // onFocus={onOpen}
+              size={["sm", "md"]}
+              onFocus={onOpen}
               onChange={(e) => {
                 setTextInput(e.currentTarget.value);
               }}
+            />
+            <ReviewModal
+              isOpen={isOpen}
+              onClose={onClose}
+              finalRef={finalRef}
             />
             {/* <CommentOnFocus isOpen={isOpen} onBlurFocus={onBlurFocus} /> */}
           </Flex>
