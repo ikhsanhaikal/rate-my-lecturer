@@ -25,8 +25,9 @@ import Comment from "./Comment";
 import Stars from "./Stars";
 import { useState } from "react";
 
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import data from "./db.json";
+import { gql, useQuery } from "@apollo/client";
 
 function getLecturer(lecturerId) {
   const { lecturers } = data;
@@ -41,12 +42,40 @@ export function loader({ params }) {
   return { lecturer };
 }
 
-const Lecturer = ({ onClose, doc }) => {
-  const { lecturer } = useLoaderData();
+const GET_LECTURER = gql`
+  query GET_LECTURER($lecturerId: Int!) {
+    lecturer(id: $lecturerId) {
+      id
+      name
+      email
+      lab {
+        name
+        code
+      }
+    }
+  }
+`;
+
+const Lecturer = () => {
+  const { lecturerId } = useParams();
+  const { loading, error, data } = useQuery(GET_LECTURER, {
+    variables: { lecturerId: parseInt(lecturerId) },
+  });
   const navigate = useNavigate();
   const [textInput, setTextInput] = useControllableState("");
   const [comments, setComments] = useState([]);
   const { isOpen, onOpen, onBlurFocus } = useDisclosure();
+
+  if (loading) {
+    return <p>loading...</p>;
+  }
+
+  if (error) {
+    console.log(error);
+    return <p>error...</p>;
+  }
+
+  console.log(data);
 
   return (
     <Box bgColor="white" width="full" h="full" overflowY="scroll">
@@ -66,19 +95,17 @@ const Lecturer = ({ onClose, doc }) => {
       <Box display="flex" flexDir="column" py="4" w="full">
         <Box px={3}>
           <Heading fontSize={["larger", "xl", "2xl"]} textAlign={"start"}>
-            {lecturer.name}
+            {data.lecturer.name}
           </Heading>
           <Text textAlign={"start"} fontWeight={"semibold"}>
-            expertise {"\u2022"} {lecturer.expertise}
+            expertise {"\u2022"} {data.lecturer.lab.name}
           </Text>
           <Text
             textAlign={"start"}
             py={2}
             pr={2}
             fontSize={["sm", "md", "lg", "xl"]}
-          >
-            {lecturer.description}
-          </Text>
+          ></Text>
           <HStack spacing={"2.5"} justifyContent={"flex-start"} pb={4}>
             <Text fontSize={"sm"} textColor={"red.400"}>
               3.0
@@ -86,13 +113,13 @@ const Lecturer = ({ onClose, doc }) => {
             <Stars total={3} />
           </HStack>
           <Box textAlign={"start"}>
-            {lecturer.tags.map((label) => {
+            {/* {lecturer.tags.map((label) => {
               return (
                 <Tag key={label} m={0.5}>
                   {label}
                 </Tag>
               );
-            })}
+            })} */}
           </Box>
           <Divider py={2} />
           <Text
@@ -105,17 +132,17 @@ const Lecturer = ({ onClose, doc }) => {
             subjects
           </Text>
           <Box textAlign={"start"}>
-            {lecturer.subjects.map((label) => {
+            {/* {lecturer.subjects.map((label) => {
               return (
                 <Tag key={label} m={0.5}>
                   {label}
                 </Tag>
               );
-            })}
+            })} */}
           </Box>
           <Divider my={2} />
         </Box>
-        {/* <Box>
+        <Box>
           <Text textAlign={"start"} px={3}>
             Comments ({comments.length})
           </Text>
@@ -127,14 +154,14 @@ const Lecturer = ({ onClose, doc }) => {
               bg={"white"}
               value={textInput}
               size={["sm"]}
-              onFocus={onOpen}
+              // onFocus={onOpen}
               onChange={(e) => {
                 setTextInput(e.currentTarget.value);
               }}
             />
-            <CommentOnFocus isOpen={isOpen} onBlurFocus={onBlurFocus} />
+            {/* <CommentOnFocus isOpen={isOpen} onBlurFocus={onBlurFocus} /> */}
           </Flex>
-          {comments.map((comment) => {
+          {/* {comments.map((comment) => {
             return (
               <Comment
                 key={comment.id}
@@ -142,8 +169,8 @@ const Lecturer = ({ onClose, doc }) => {
                 updateComment={null}
               />
             );
-          })}
-        </Box> */}
+          })} */}
+        </Box>
       </Box>
     </Box>
   );

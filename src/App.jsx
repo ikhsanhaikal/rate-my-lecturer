@@ -18,8 +18,8 @@ import { Outlet } from "react-router-dom";
 import SidebarFilter from "./SidebarFilter";
 
 function App() {
-  // const [lecturers, setLecturers] = useState(() => data.lecturers);
   const [onFocus, setOnFocus] = useState(false);
+  const [filter, setFilter] = useState(() => ({ gender: [] }));
   const [below720] = useMediaQuery("(max-width: 720px)");
   return (
     <Box className="App">
@@ -28,13 +28,7 @@ function App() {
           {onFocus ? (
             <MiniSearch setOnFocus={() => setOnFocus(false)} />
           ) : (
-            <Flex
-              // border="4px"
-              // borderColor="red.200"
-              flexDirection="column"
-              // bgColor="#F1F3F4"
-              minH="100vh"
-            >
+            <Flex flexDirection="column" minH="100vh">
               <Box pb={5} mb={2}>
                 <MiniHeader />
                 <VStack
@@ -47,10 +41,12 @@ function App() {
                   <CustomTab />
                 </VStack>
               </Box>
-              <Flex flexDirection="row">
-                {below720 ? null : <SidebarFilter />}
-                <Box flex="2">
-                  <Outlet />
+              <Flex flexDirection="row" maxH="2xl">
+                {below720 ? null : (
+                  <SidebarFilter filter={filter} setFilter={setFilter} />
+                )}
+                <Box flex="2" overflowY="auto">
+                  <Outlet context={[filter]} />
                 </Box>
               </Flex>
             </Flex>

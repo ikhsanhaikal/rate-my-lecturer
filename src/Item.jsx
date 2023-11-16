@@ -43,7 +43,7 @@ const Item = ({ doc }) => {
             {doc.name}
           </Heading>
           <Text>
-            expertise {"\u2022"} {doc.expertise}
+            expertise {"\u2022"} {doc.lab.name}
           </Text>
         </Box>
       </HStack>

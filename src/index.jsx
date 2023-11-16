@@ -1,17 +1,19 @@
 import React from "react";
 import App from "./App";
-import Lecturer, { loader as lecturerLoader } from "./Lecturer";
+import Lecturer from "./Lecturer";
 
 import { createRoot } from "react-dom/client";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
-import data from "./db.json";
+
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+
 import LecturerList from "./LecturerList";
+
+const client = new ApolloClient({
+  uri: "http://127.0.0.1:5050/graphql",
+  cache: new InMemoryCache(),
+});
 
 const router = createBrowserRouter([
   {
@@ -21,25 +23,16 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <LecturerList />,
-        loader: () => {
-          const { lecturers } = data;
-          return { lecturers };
-        },
       },
       {
         path: "desktop/lecturers/:lecturerId",
         element: <Lecturer />,
-        loader: lecturerLoader,
       },
     ],
   },
   {
     path: "mobile/lecturers/:lecturerId",
     element: <Lecturer />,
-    loader: () => {
-      const { lecturers } = data;
-      return { lecturer: lecturers[0] };
-    },
   },
 ]);
 
@@ -49,11 +42,9 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <ChakraProvider>
-      <RouterProvider router={router}>
-        <Routes>
-          <Route path="/todos" element={<h1>hello, world</h1>} />
-        </Routes>
-      </RouterProvider>
+      <ApolloProvider client={client}>
+        <RouterProvider router={router}></RouterProvider>
+      </ApolloProvider>
     </ChakraProvider>
   </React.StrictMode>
 );

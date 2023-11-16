@@ -1,3 +1,4 @@
+import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Checkbox,
@@ -7,32 +8,48 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-export default function SidebarFilter() {
+const GET_SUBJECTS_CHARACTERS = gql`
+  query GET_SUBJECTS_CHARACTERS {
+    subjects: subjects {
+      id
+      name
+    }
+    characters: characters {
+      id
+      name
+    }
+  }
+`;
+
+export default function SidebarFilter({ filter, setFilter }) {
+  const { loading, error, data } = useQuery(GET_SUBJECTS_CHARACTERS);
+
+  if (loading) {
+    return <p>loading...</p>;
+  }
+
+  if (error) {
+    return <p>error..</p>;
+  }
+
   return (
     <Box
       className="category-bar"
       w="250px"
-      // bg="#F1F3F4"
+      bg="#F1F3F4"
+      rounded="md"
       mr="10"
       paddingX="3"
-      borderWidth="10"
-      borderColor="red.100"
+      overflowY="auto"
     >
-      <CheckboxGroup colorScheme="green" defaultValue={[]}>
+      <CheckboxGroup colorScheme="green">
         <Box marginY={3}>
           <Text as="b">subjects</Text>
         </Box>
         <Stack direction="column">
-          {[
-            "linear algebra",
-            "dasar pemrograman",
-            "jaringan komputer",
-            "sistem operasi",
-            "data mining",
-            "pemrograman berbasis objek",
-          ].map((subject) => (
-            <Checkbox key={subject} value={subject}>
-              {subject}
+          {data.subjects.map((subject) => (
+            <Checkbox key={subject.id} value={subject.name}>
+              {subject.name}
             </Checkbox>
           ))}
         </Stack>
@@ -40,33 +57,34 @@ export default function SidebarFilter() {
       <Divider orientation="horizontal" my="3" />
       <CheckboxGroup colorScheme="green">
         <Box marginY={3}>
-          <Text as="b">behaviors</Text>
+          <Text as="b">types</Text>
         </Box>
         <Stack direction="column">
-          {[
-            "auto lulus",
-            "auto ngulang",
-            "santuy",
-            "gaje",
-            "bolosan",
-            "tugasan",
-            "presentasian",
-            "killer",
-          ].map((subject) => (
-            <Checkbox key={subject} value={subject}>
-              {subject}
+          {data.characters.map((character) => (
+            <Checkbox key={character.id} value={character.name}>
+              {character.name}
             </Checkbox>
           ))}
         </Stack>
       </CheckboxGroup>
       <Divider orientation="horizontal" my="3" />
-      <CheckboxGroup colorScheme="green" defaultValue={[]}>
+      <CheckboxGroup
+        colorScheme="green"
+        onChange={(value) => {
+          if (value.length === 2) {
+            value.shift();
+          }
+          setFilter(() => ({
+            gender: value,
+          }));
+        }}
+      >
         <Box marginY={3}>
           <Text as="b">genders</Text>
         </Box>
-        <Stack direction="column">
+        <Stack direction="column" marginBottom="3">
           {["female", "male"].map((subject) => (
-            <Checkbox key={subject} value={subject}>
+            <Checkbox key={subject} value={subject.toUpperCase()}>
               {subject}
             </Checkbox>
           ))}

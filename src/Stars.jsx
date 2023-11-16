@@ -12,7 +12,7 @@ const Stars = ({ total }) => {
             <StarIcon key={uuidv4()} textColor={"red.400"} fontSize={"xs"} />
           );
         })}
-      {Array(4 - total)
+      {Array(5 - total)
         .fill(0)
         .map(() => {
           return (

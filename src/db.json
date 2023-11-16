@@ -20,7 +20,7 @@
     {
       "id": 2,
       "name": "arya yudhi wijaya",
-      "expertise": "Applied Modeling and Computing",
+      "expertise": "applied modeling and computing",
       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
       "tags": [
         "tag1",
@@ -86,7 +86,7 @@
     {
       "id": 6,
       "name": "wahyu suadi",
-      "expertise": "Architecture and Computer Networking",
+      "expertise": "architecture and computer networking",
       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
       "tags": [
         "tag6",
@@ -103,7 +103,7 @@
     {
       "id": 7,
       "name": "royyana muslim ijtihadie",
-      "expertise": "Architecture and Computer Networking",
+      "expertise": "architecture and computer networking",
       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
       "tags": [
         "tag2",
@@ -120,7 +120,7 @@
     {
       "id": 8,
       "name": "radityo anggoro",
-      "expertise": "Architecture and Computer Networking",
+      "expertise": "architecture and computer networking",
       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fusce ut placerat orci nulla pellentesque dignissim enim sit.",
       "tags": [
         "tag2",
