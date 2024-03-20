@@ -6,14 +6,13 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client";
+
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import LecturerList from "./LecturerList";
 
-const client = new ApolloClient({
-  uri: "http://127.0.0.1:5050/graphql",
-  cache: new InMemoryCache(),
-});
+import { apolloClient } from "./apolloClient";
 
 const router = createBrowserRouter([
   {
@@ -41,10 +40,12 @@ const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <ChakraProvider>
-      <ApolloProvider client={client}>
-        <RouterProvider router={router}></RouterProvider>
-      </ApolloProvider>
-    </ChakraProvider>
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID_GOAUTH}>
+      <ChakraProvider>
+        <ApolloProvider client={apolloClient}>
+          <RouterProvider router={router}></RouterProvider>
+        </ApolloProvider>
+      </ChakraProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>
 );

@@ -1,26 +1,37 @@
-import {
-  Box,
-  Container,
-  Flex,
-  Tab,
-  TabList,
-  Tabs,
-  VStack,
-  useMediaQuery,
-} from "@chakra-ui/react";
+import { Box, Container, Flex, Show, VStack } from "@chakra-ui/react";
 import MiniSearch from "./MiniSearch";
 import MiniHeader from "./MiniHeader";
 import SearchBar from "./SearchBar";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Outlet } from "react-router-dom";
 import SidebarFilter from "./SidebarFilter";
+import HeaderTab from "./HeaderTab";
+import { useBoundStore } from ".";
 
 function App() {
   const [onFocus, setOnFocus] = useState(false);
   const [filter, setFilter] = useState(() => ({ gender: [] }));
-  const [below720] = useMediaQuery("(max-width: 720px)");
+  const user = useBoundStore((state) => state.user);
+  const login = useBoundStore((state) => state.login);
+
+  useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (currentUser !== null) {
+      login(currentUser);
+    }
+  }, [login]);
+
+  useEffect(() => {
+    console.log(`useEffect()`, user);
+    if (user) {
+      localStorage.setItem("currentUser", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("currentUser");
+    }
+  }, [user]);
+
   return (
     <Box className="App">
       <Container maxW="container.lg">
@@ -38,13 +49,13 @@ function App() {
                   h="full"
                 >
                   <SearchBar setOnFocus={() => setOnFocus(true)} />
-                  <CustomTab />
+                  <HeaderTab />
                 </VStack>
               </Box>
               <Flex flexDirection="row" maxH="2xl">
-                {below720 ? null : (
+                <Show breakpoint="(min-width: 720px)">
                   <SidebarFilter filter={filter} setFilter={setFilter} />
-                )}
+                </Show>
                 <Box flex="2" overflowY="auto">
                   <Outlet context={[filter]} />
                 </Box>
@@ -58,44 +69,3 @@ function App() {
 }
 
 export default App;
-
-function CustomTab() {
-  return (
-    <Tabs
-      w={"full"}
-      align={"center"}
-      bg={"#F1F3F4"}
-      onChange={(id) => {
-        console.log("id: ", id);
-      }}
-    >
-      <TabList bgColor={"white"}>
-        <Tab
-          _focus={{ outline: "none" }}
-          fontSize={["sm"]}
-          fontWeight={"medium"}
-        >
-          All
-        </Tab>
-        <Tab
-          _focus={{ outline: "none" }}
-          fontSize={["sm"]}
-          fontWeight={"medium"}
-        >
-          Most Picks
-        </Tab>
-        <Tab
-          _focus={{ outline: "none" }}
-          fontSize={["sm"]}
-          fontWeight={"medium"}
-        >
-          Will ruin your semester
-        </Tab>
-      </TabList>
-      {/* <TabPanels>
-        <TabPanel p={0} bg={"#F1F3F4"}></TabPanel>
-        <TabPanel p={0} bg={"#F1F3F4"}></TabPanel>
-      </TabPanels> */}
-    </Tabs>
-  );
-}

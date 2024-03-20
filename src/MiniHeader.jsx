@@ -12,17 +12,55 @@ import {
   useDisclosure,
   VStack,
   Flex,
-  useMediaQuery,
+  Show,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuGroup,
+  MenuDivider,
+  MenuList,
 } from "@chakra-ui/react";
 
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { useRef } from "react";
 import { BsFilterRight } from "react-icons/bs";
 import TagList from "./TagList";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import { useBoundStore } from ".";
+
+axios.defaults.withCredentials = true;
 
 const MiniHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [below600] = useMediaQuery("(max-width: 650px)");
+  const user = useBoundStore((state) => state.user);
+  const login = useBoundStore((state) => state.login);
+  const logout = useBoundStore((state) => state.logout);
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      console.log(tokenResponse);
+      try {
+        const { status, data } = await axios.post(
+          "https://127.0.0.1:5050/verify",
+          {
+            code: tokenResponse.code,
+          },
+          { withCredentials: true }
+        );
+        console.log(data, status);
+        console.log("call login");
+        login(data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    onError: (errorResponse) => {
+      console.log(errorResponse);
+    },
+    flow: "auth-code",
+  });
+
   return (
     <Box
       display={"flex"}
@@ -37,14 +75,43 @@ const MiniHeader = () => {
         justifyContent={"space-between"}
         w="full"
         pt={2}
-        px={2}
+        marginStart={0}
+        // px={2}
       >
-        <Icon as={HamburgerIcon} fontSize={"2xl"} />
-        {below600 ? (
+        <Menu>
+          <MenuButton as={Button} margin={0} padding={0}>
+            <Icon as={HamburgerIcon} fontSize={"xl"} />
+          </MenuButton>
+          <MenuList>
+            {user === null ? (
+              <MenuItem
+                onClick={async () => {
+                  googleLogin();
+                }}
+              >
+                Sign In
+              </MenuItem>
+            ) : (
+              <MenuGroup title={user.email}>
+                <MenuItem
+                  onClick={async () => {
+                    console.log("Oucch");
+                    await axios.post("https://127.0.0.1:5050/terminate", {
+                      withCredentials: true,
+                    });
+                    logout();
+                  }}
+                >
+                  sign out
+                </MenuItem>
+              </MenuGroup>
+            )}
+          </MenuList>
+        </Menu>
+        <Show breakpoint="(max-width: 720px)">
           <Icon as={BsFilterRight} fontSize={"3xl"} onClick={onOpen} />
-        ) : null}
-
-        <DrawerFilter isOpen={isOpen} onClose={onClose} />
+          <DrawerFilter isOpen={isOpen} onClose={onClose} />
+        </Show>
       </Flex>
     </Box>
   );
