@@ -3,7 +3,6 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
-  Button,
   Divider,
   Flex,
   Heading,
@@ -11,14 +10,8 @@ import {
   IconButton,
   Tag,
   Text,
-  useControllableState,
   Input,
   useDisclosure,
-  Textarea,
-  Drawer,
-  DrawerBody,
-  DrawerOverlay,
-  DrawerContent,
 } from "@chakra-ui/react";
 
 import Comment from "./Comment";
@@ -27,8 +20,12 @@ import React, { useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import data from "./db.json";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import ReviewModal from "./ReviewModal";
+
+import { useBoundStore } from ".";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 function getLecturer(lecturerId) {
   const { lecturers } = data;
@@ -53,6 +50,40 @@ const GET_LECTURER = gql`
         name
         code
       }
+      tags {
+        id
+        name
+      }
+      subjects {
+        id
+        name
+      }
+    }
+  }
+`;
+
+const ADD_REVIEW = gql`
+  mutation Mutation($input: reviewinput!) {
+    reviewCreate(input: $input) {
+      reviewer {
+        username
+        id
+      }
+      comment
+      rate
+      course {
+        id
+        subject {
+          id
+          name
+        }
+        year
+        semester
+      }
+      tags {
+        id
+        name
+      }
     }
   }
 `;
@@ -62,10 +93,45 @@ const Lecturer = () => {
   const { loading, error, data } = useQuery(GET_LECTURER, {
     variables: { lecturerId: parseInt(lecturerId) },
   });
+
+  const [addReview, { dataReview, loadingAddReview, errorAddReview }] =
+    useMutation(ADD_REVIEW);
+
+  const user = useBoundStore((state) => state.user);
+  const login = useBoundStore((state) => state.login);
+
+  const inputCommentRef = React.useRef(null);
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      console.log(tokenResponse);
+      try {
+        const { status, data } = await axios.post(
+          "https://127.0.0.1:5050/verify",
+          {
+            code: tokenResponse.code,
+          },
+          { withCredentials: true }
+        );
+        console.log(data, status);
+        console.log("call login");
+        login(data);
+      } catch (error) {
+        onClose();
+      }
+    },
+    onNonOAuthError: () => {
+      onClose();
+    },
+    onError: (errorResponse) => {
+      // console.log(errorResponse);
+      onClose();
+    },
+    flow: "auth-code",
+  });
+
   const navigate = useNavigate();
-  const [textInput, setTextInput] = useControllableState("");
-  const [comments, setComments] = useState([]);
-  const { isOpen, onOpen, onBlurFocus, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const finalRef = React.useRef(null);
 
@@ -110,19 +176,16 @@ const Lecturer = () => {
             fontSize={["sm", "md", "lg", "xl"]}
           ></Text>
           <HStack spacing={"2.5"} justifyContent={"flex-start"} pb={4}>
-            {/* <Text fontSize={"sm"} textColor={"red.400"}>
-              3.0
-            </Text> */}
             <Stars total={3} />
           </HStack>
           <Box textAlign={"start"}>
-            {/* {lecturer.tags.map((label) => {
+            {data.lecturer.tags.map((tag) => {
               return (
-                <Tag key={label} m={0.5}>
-                  {label}
+                <Tag key={tag.id} m={0.5}>
+                  {tag.name}
                 </Tag>
               );
-            })} */}
+            })}
           </Box>
           <Divider py={2} />
           <Text
@@ -135,19 +198,19 @@ const Lecturer = () => {
             subjects
           </Text>
           <Box textAlign={"start"}>
-            {/* {lecturer.subjects.map((label) => {
+            {data.lecturer.subjects.map((subject) => {
               return (
-                <Tag key={label} m={0.5}>
-                  {label}
+                <Tag key={subject.id} m={0.5}>
+                  {subject.name}
                 </Tag>
               );
-            })} */}
+            })}
           </Box>
           <Divider my={2} />
         </Box>
         <Box>
           <Text textAlign={"start"} px={3}>
-            Comments ({comments.length})
+            {/* Comments ({comments.length}) */}
           </Text>
           <Flex alignItems="center" padding={3} columnGap={3} ref={finalRef}>
             <Avatar size={["xs", "sm"]}></Avatar>
@@ -155,19 +218,29 @@ const Lecturer = () => {
               placeholder="Add a commment..."
               borderRadius={"none"}
               bg={"white"}
-              value={textInput}
               size={["sm", "md"]}
               onFocus={onOpen}
-              onChange={(e) => {
-                setTextInput(e.currentTarget.value);
-              }}
+              ref={inputCommentRef}
             />
+            {/* {user == null && isOpen ? (
+              (function () {
+                googleLogin();
+                inputCommentRef.current.blur();
+              })()
+            ) : (
+              <ReviewModal
+                isOpen={isOpen}
+                onClose={onClose}
+                finalRef={finalRef}
+                addReview={addReview}
+              />
+            )} */}
             <ReviewModal
               isOpen={isOpen}
               onClose={onClose}
               finalRef={finalRef}
+              addReview={addReview}
             />
-            {/* <CommentOnFocus isOpen={isOpen} onBlurFocus={onBlurFocus} /> */}
           </Flex>
           {/* {comments.map((comment) => {
             return (
@@ -185,54 +258,3 @@ const Lecturer = () => {
 };
 
 export default Lecturer;
-
-function CommentOnFocus({ isOpen, onBlurFocus }) {
-  const [text, setText] = useState("");
-  const [rows, setRows] = useState(1);
-  const [scrollHeight, setScrollHeight] = useState(null);
-
-  return (
-    <Drawer isOpen={isOpen} placement="bottom" onClose={onBlurFocus}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerBody>
-          <Flex alignItems="center" paddingY={0}>
-            <Flex alignItems="flex-start" w={"full"}>
-              <Avatar size="sm" mt={1}></Avatar>
-              <Textarea
-                placeholder="Add a commment..."
-                borderRadius={"none"}
-                border={"none"}
-                _focus={{ outline: "none" }}
-                bg={"white"}
-                resize="none"
-                autoFocus={true}
-                rows={rows}
-                onChange={(e) => {
-                  setText(e.target.value);
-                  console.log("scrollHeight", e.currentTarget.scrollHeight);
-                  console.log("clientHeight", e.currentTarget.clientHeight);
-                  if (
-                    e.currentTarget.scrollHeight > e.currentTarget.clientHeight
-                  ) {
-                    setRows(rows + 1);
-                    setScrollHeight(e.currentTarget.clientHeight);
-                  } else if (
-                    e.currentTarget.scrollHeight < e.currentTarget.clientHeight
-                  ) {
-                    setRows(rows - 1);
-                  }
-                }}
-              />
-            </Flex>
-            <Flex alignItems={"end"} h="full">
-              <Button size={["xs", "sm"]} p={1}>
-                Post
-              </Button>
-            </Flex>
-          </Flex>
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
-  );
-}
