@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import SidebarFilter from "./SidebarFilter";
 import HeaderTab from "./HeaderTab";
-import { useBoundStore } from ".";
+import { useBoundStore } from "./useBoundStore";
 
 function App() {
   const [onFocus, setOnFocus] = useState(false);

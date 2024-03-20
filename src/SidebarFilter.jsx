@@ -8,7 +8,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
-import { useBoundStore } from ".";
+import { useBoundStore } from "./useBoundStore";
 
 const GET_SUBJECTS_CHARACTERS = gql`
   query GET_SUBJECTS_CHARACTERS {

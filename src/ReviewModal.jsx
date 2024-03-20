@@ -19,7 +19,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useBoundStore } from ".";
+import { useBoundStore } from "./useBoundStore";
 
 // const GET_COURSES = gql``;
 

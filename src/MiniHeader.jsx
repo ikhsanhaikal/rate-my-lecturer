@@ -27,7 +27,7 @@ import { BsFilterRight } from "react-icons/bs";
 import TagList from "./TagList";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import { useBoundStore } from ".";
+import { useBoundStore } from "./useBoundStore";
 
 axios.defaults.withCredentials = true;
 

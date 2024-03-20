@@ -23,7 +23,7 @@ import data from "./db.json";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import ReviewModal from "./ReviewModal";
 
-import { useBoundStore } from ".";
+import { useBoundStore } from "./useBoundStore";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 
