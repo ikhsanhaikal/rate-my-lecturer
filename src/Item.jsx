@@ -1,14 +1,13 @@
 import {
+  Avatar,
   Box,
   Heading,
   HStack,
   Text,
-  Slide,
-  SlideFade,
   useDisclosure,
   useMediaQuery,
 } from "@chakra-ui/react";
-import LecturerView from "./Lecturer";
+
 const Item = ({ doc }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [below720] = useMediaQuery("(max-width: 720px)");
@@ -30,14 +29,9 @@ const Item = ({ doc }) => {
           if (below720) onOpen();
         }}
       >
-        <Box
-          w={below720 ? "100px" : "60px"}
-          h={below720 ? "100px" : "60px"}
-          bg={"gray.200"}
-          className="profile-pic"
-          borderRadius={below720 ? 0 : 50}
-          flexShrink={0}
-        ></Box>
+        <Avatar
+          src={`https://ui-avatars.com/api/?name=${doc.name}&background=random`}
+        />
         <Box textAlign={"start"}>
           <Heading fontSize={["lg", "xl"]} textAlign={"start"}>
             {doc.name}
