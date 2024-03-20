@@ -7,6 +7,8 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { useEffect } from "react";
+import { useBoundStore } from ".";
 
 const GET_SUBJECTS_CHARACTERS = gql`
   query GET_SUBJECTS_CHARACTERS {
@@ -23,6 +25,11 @@ const GET_SUBJECTS_CHARACTERS = gql`
 
 export default function SidebarFilter({ filter, setFilter }) {
   const { loading, error, data } = useQuery(GET_SUBJECTS_CHARACTERS);
+  const initializeTags = useBoundStore((state) => state.initializeTags);
+
+  useEffect(() => {
+    initializeTags(data?.characters ?? []);
+  }, [data, initializeTags]);
 
   if (loading) {
     return <p>loading...</p>;

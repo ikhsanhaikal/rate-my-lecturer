@@ -19,14 +19,22 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { useBoundStore } from ".";
 
-const ReviewModal = ({ isOpen, onClose, finalRef }) => {
-  const [tags, setTags] = useState(new Set());
+// const GET_COURSES = gql``;
+
+const ReviewModal = ({ isOpen, onClose, finalRef, addReview }) => {
+  const [pickedTags, setPickedTags] = useState(new Set());
   const [hoverIdx, setHoverIdx] = useState(null);
   const [selectedStar, setSelectedStar] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const tags = useBoundStore((state) => state.tags);
+
   useEffect(() => {
-    setTags(() => new Set());
+    setPickedTags(() => new Set());
     setSelectedStar(() => 0);
+    setComment(null);
   }, [isOpen]);
 
   return (
@@ -44,7 +52,11 @@ const ReviewModal = ({ isOpen, onClose, finalRef }) => {
           <ModalBody pb={6}>
             <FormControl isRequired>
               <FormLabel>Comments</FormLabel>
-              <Textarea placeholder="Class was very interactive and fun!" />
+              <Textarea
+                placeholder="Class was very interactive and fun!"
+                onChange={(ev) => setComment(ev.target.value)}
+                value={comment}
+              />
             </FormControl>
             <FormControl isRequired my="2">
               <FormLabel>Tags</FormLabel>
@@ -52,25 +64,25 @@ const ReviewModal = ({ isOpen, onClose, finalRef }) => {
                 placeholder="Add tags"
                 onChange={(ev) => {
                   if (ev.target.value !== "") {
-                    setTags((prev) => new Set(prev).add(ev.target.value));
+                    setPickedTags((prev) => new Set(prev).add(ev.target.value));
                   }
                 }}
               >
-                <option>santuy</option>
-                <option>auto lulus</option>
-                <option>tugasan</option>
-                <option>auto ngulang</option>
-                <option>enak jelasinnya</option>
+                {tags.map((tag) => (
+                  <option key={tag.id}>{tag.name}</option>
+                ))}
               </Select>
               <Stack direction="row" my="2">
-                {[...tags].map((tag) => {
+                {[...pickedTags].map((tag) => {
                   return (
                     <Tag key={tag}>
                       {tag}
                       <TagCloseButton
                         onClick={() => {
-                          setTags(
-                            new Set([...tags].filter((value) => value !== tag))
+                          setPickedTags(
+                            new Set(
+                              [...pickedTags].filter((value) => value !== tag)
+                            )
                           );
                         }}
                       />
@@ -119,7 +131,13 @@ const ReviewModal = ({ isOpen, onClose, finalRef }) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3}>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                addReview({ variables: { input: {} } });
+              }}
+            >
               Post
             </Button>
             <Button onClick={onClose}>Cancel</Button>
