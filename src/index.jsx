@@ -24,14 +24,10 @@ const router = createBrowserRouter([
         element: <LecturerList />,
       },
       {
-        path: "desktop/lecturers/:lecturerId",
+        path: "lecturers/:lecturerId",
         element: <Lecturer />,
       },
     ],
-  },
-  {
-    path: "mobile/lecturers/:lecturerId",
-    element: <Lecturer />,
   },
 ]);
 

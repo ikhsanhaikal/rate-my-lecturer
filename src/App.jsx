@@ -1,4 +1,5 @@
-import { Box, Container, Flex, Show, VStack } from "@chakra-ui/react";
+import { Box, Container, Flex, VStack, useMediaQuery } from "@chakra-ui/react";
+import { Grid, GridItem } from "@chakra-ui/react";
 import MiniSearch from "./MiniSearch";
 import MiniHeader from "./MiniHeader";
 import SearchBar from "./SearchBar";
@@ -12,9 +13,10 @@ import { useBoundStore } from "./useBoundStore";
 
 function App() {
   const [onFocus, setOnFocus] = useState(false);
-  const [filter, setFilter] = useState(() => ({ gender: [] }));
   const user = useBoundStore((state) => state.user);
   const login = useBoundStore((state) => state.login);
+
+  const [isLargerThan720] = useMediaQuery("(min-width: 720px)");
 
   useEffect(() => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -24,7 +26,7 @@ function App() {
   }, [login]);
 
   useEffect(() => {
-    console.log(`useEffect()`, user);
+    //console.log(`useEffect()`, user);
     if (user) {
       localStorage.setItem("currentUser", JSON.stringify(user));
     } else {
@@ -52,14 +54,33 @@ function App() {
                   <HeaderTab />
                 </VStack>
               </Box>
-              <Flex flexDirection="row" maxH="2xl">
-                <Show breakpoint="(min-width: 720px)">
-                  <SidebarFilter filter={filter} setFilter={setFilter} />
-                </Show>
-                <Box flex="2" overflowY="auto">
-                  <Outlet context={[filter]} />
-                </Box>
-              </Flex>
+              <Grid
+                //maxH={"2xl"}
+                //overflow={"auto"}
+                templateColumns="repeat(16, 1fr)"
+                gap={4}
+              >
+                {isLargerThan720 ? (
+                  <GridItem
+                    colSpan={4}
+                    maxH={"2xl"}
+                    overflow={"auto"}
+                    //bg="tomato"
+                  >
+                    <SidebarFilter />
+                  </GridItem>
+                ) : null}
+                <GridItem
+                  id="scrollableGridItem"
+                  colSpan={isLargerThan720 ? 12 : 16}
+                  overflow={"auto"}
+                  height={"fit-content"}
+                  maxH={"2xl"}
+                  //bg="papayawhip"
+                >
+                  <Outlet />
+                </GridItem>
+              </Grid>
             </Flex>
           )}
         </>

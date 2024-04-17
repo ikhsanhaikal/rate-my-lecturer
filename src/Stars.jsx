@@ -16,7 +16,7 @@ const Stars = ({ total }) => {
         .fill(0)
         .map(() => {
           return (
-            <StarIcon key={uuidv4()} textColor={"orange.400"} fontSize={"lg"} />
+            <StarIcon key={uuidv4()} textColor={"gray.200"} fontSize={"lg"} />
           );
         })}
     </HStack>

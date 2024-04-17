@@ -1,41 +1,63 @@
-import { StarIcon } from "@chakra-ui/icons";
 import {
-  Box,
   Button,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
   FormControl,
   FormLabel,
-  Select,
-  Textarea,
-  Stack,
+  FormErrorMessage,
+  Input,
   Tag,
   TagCloseButton,
-  HStack,
+  Select,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useBoundStore } from "./useBoundStore";
+import { gql, useQuery } from "@apollo/client";
+import { Form, Formik } from "formik";
+import { Rating } from "react-simple-star-rating";
 
-// const GET_COURSES = gql``;
+const GET_METADATA = gql`
+  query GET_METADATA($lecturerId: Int!) {
+    characters {
+      id
+      name
+    }
+    lecturer(id: $lecturerId) {
+      courses {
+        id
+        subject {
+          id
+          name
+        }
+        year
+        semester
+      }
+    }
+  }
+`;
 
-const ReviewModal = ({ isOpen, onClose, finalRef, addReview }) => {
-  const [pickedTags, setPickedTags] = useState(new Set());
-  const [hoverIdx, setHoverIdx] = useState(null);
-  const [selectedStar, setSelectedStar] = useState(0);
-  const [comment, setComment] = useState("");
+const ReviewModal = ({
+  isOpen,
+  onClose,
+  finalRef,
+  addReview,
+  result,
+  lecturerId,
+}) => {
+  const { loading, error, data } = useQuery(GET_METADATA, {
+    variables: {
+      lecturerId: lecturerId,
+    },
+  });
 
-  const tags = useBoundStore((state) => state.tags);
-
-  useEffect(() => {
-    setPickedTags(() => new Set());
-    setSelectedStar(() => 0);
-    setComment(null);
-  }, [isOpen]);
+  if (error) {
+    console.log(`error: `, error);
+  }
+  if (loading) {
+    return <>Beautifull loading ui..</>;
+  }
 
   return (
     <>
@@ -50,98 +72,8 @@ const ReviewModal = ({ isOpen, onClose, finalRef, addReview }) => {
           <ModalHeader>Your review of the lecturer</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl isRequired>
-              <FormLabel>Comments</FormLabel>
-              <Textarea
-                placeholder="Class was very interactive and fun!"
-                onChange={(ev) => setComment(ev.target.value)}
-                value={comment}
-              />
-            </FormControl>
-            <FormControl isRequired my="2">
-              <FormLabel>Tags</FormLabel>
-              <Select
-                placeholder="Add tags"
-                onChange={(ev) => {
-                  if (ev.target.value !== "") {
-                    setPickedTags((prev) => new Set(prev).add(ev.target.value));
-                  }
-                }}
-              >
-                {tags.map((tag) => (
-                  <option key={tag.id}>{tag.name}</option>
-                ))}
-              </Select>
-              <Stack direction="row" my="2">
-                {[...pickedTags].map((tag) => {
-                  return (
-                    <Tag key={tag}>
-                      {tag}
-                      <TagCloseButton
-                        onClick={() => {
-                          setPickedTags(
-                            new Set(
-                              [...pickedTags].filter((value) => value !== tag)
-                            )
-                          );
-                        }}
-                      />
-                    </Tag>
-                  );
-                })}
-              </Stack>
-            </FormControl>
-            <FormControl isRequired my="2">
-              <FormLabel>Class</FormLabel>
-              <Select placeholder="Kelas yang diambil">
-                <option>dasar pemrograman , 2020, genap</option>
-                <option>struktur data, 2020, ganjil</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Rate</FormLabel>
-              <HStack>
-                {[1, 2, 3, 4, 5].map((idx) => {
-                  return (
-                    <Box
-                      key={idx}
-                      onMouseEnter={() => {
-                        setHoverIdx(idx);
-                      }}
-                      onMouseLeave={() => {
-                        setHoverIdx(null);
-                      }}
-                      onClick={() => {
-                        setSelectedStar(idx);
-                      }}
-                    >
-                      <StarIcon
-                        fontSize="2xl"
-                        textColor={
-                          idx <= (hoverIdx || selectedStar)
-                            ? "orange.200"
-                            : "gray.200"
-                        }
-                      />
-                    </Box>
-                  );
-                })}
-              </HStack>
-            </FormControl>
+            <FormForReview data={data} addReview={addReview} />
           </ModalBody>
-
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={() => {
-                addReview({ variables: { input: {} } });
-              }}
-            >
-              Post
-            </Button>
-            <Button onClick={onClose}>Cancel</Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </>
@@ -149,3 +81,164 @@ const ReviewModal = ({ isOpen, onClose, finalRef, addReview }) => {
 };
 
 export default ReviewModal;
+const validate = (values) => {
+  const errors = {};
+  if (!values.comment || values.comment.length === 0) {
+    errors.comment = "Required";
+  }
+  if (values.course.split(":").length < 2) {
+    errors.course = "Required";
+  }
+  if (values.tags.length < 1) {
+    errors.tags = "Required one tag";
+  }
+  if (values.rating === 0) {
+    errors.rating = "Rate is required";
+  }
+  return errors;
+};
+function FormForReview({ data, addReview }) {
+  return (
+    <Formik
+      initialValues={{ comment: "", course: "", tags: [], rating: 0 }}
+      validate={validate}
+      onSubmit={(values, actions) => {
+        console.log("values: ", values);
+        addReview({
+          variables: {
+            reviewInput: {
+              comment: values.comment,
+              course: parseInt(
+                values.course.substring(values.course.indexOf(":") + 1)
+              ),
+              rating: values.rating,
+              tags: values.tags.map((tag) =>
+                parseInt(tag.substring(tag.indexOf(":") + 1))
+              ),
+            },
+          },
+        });
+
+        setTimeout(() => {
+          alert(JSON.stringify(values, null, 2));
+          actions.setSubmitting(false);
+        }, 1000);
+      }}
+    >
+      {(props) => (
+        <Form onSubmit={props.handleSubmit}>
+          <FormControl
+            isInvalid={props.errors.comment && props.touched.comment}
+          >
+            <FormLabel>Comment</FormLabel>
+            <Input
+              onChange={props.handleChange}
+              onBlur={props.handleBlur}
+              value={props.values.comment}
+              name="comment"
+              placeholder="it was fun all the times"
+            />
+            <FormErrorMessage>{props.errors.comment}</FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={props.errors.course && props.touched.course}>
+            <FormLabel>Course</FormLabel>
+            <Select
+              name="course"
+              onChange={(event) => {
+                console.log("onChange: ", event.target.value);
+                const courseId =
+                  event.target.selectedOptions[0].getAttribute("data-key");
+                props.handleChange("course")(
+                  `${event.target.value}:${courseId}`
+                );
+              }}
+              onBlur={props.handleBlur}
+              value={props.values.course.split(":")[0]}
+              placeholder="Kelas yang diambil"
+            >
+              <option>All</option>
+              {data.lecturer.courses.map((c) => {
+                return (
+                  <option key={c.id} data-key={c.id}>
+                    {c.subject.name}, {c.year}, {c.semester}
+                  </option>
+                );
+              })}
+            </Select>
+            <FormErrorMessage>{props.errors.course}</FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={props.errors.tags && props.touched.tags}>
+            <FormLabel>Tags</FormLabel>
+            <Select
+              name="tags"
+              onChange={(event) => {
+                if (props.values.tags.length === 4) {
+                  return;
+                }
+                const courseId =
+                  event.target.selectedOptions[0].getAttribute("data-key");
+                props.setFieldValue(
+                  "tags",
+                  new Set([
+                    ...props.values.tags,
+                    `${event.target.value}:${courseId}`,
+                  ])
+                    .values()
+                    .toArray()
+                );
+              }}
+              onBlur={props.handleBlur}
+              value={props.values.tags[props.values.tags.length]?.split(":")[0]}
+              placeholder="Select option"
+            >
+              {data.characters.map((tag) => (
+                <option key={tag.id} data-key={tag.id}>
+                  {tag.name}
+                </option>
+              ))}
+            </Select>
+            <FormErrorMessage>{props.errors.tags}</FormErrorMessage>
+            {props.values.tags
+              .values()
+              .map((tag) => {
+                return (
+                  <Tag key={tag}>
+                    {tag.split(":")[0]}
+                    <TagCloseButton
+                      onClick={() => {
+                        props.setFieldValue(
+                          "tags",
+                          props.values.tags.filter((t) => t !== tag)
+                        );
+                      }}
+                    />
+                  </Tag>
+                );
+              })
+              .toArray()}
+          </FormControl>
+          <FormControl isInvalid={props.errors.rating && props.touched.rating}>
+            <FormLabel>Rating</FormLabel>
+            <Rating
+              onClick={(rate) => {
+                props.setFieldValue("rating", rate);
+              }}
+              allowFraction={true}
+              className="rating"
+            />
+            <FormErrorMessage>{props.errors.rating}</FormErrorMessage>
+          </FormControl>
+
+          <Button
+            mt={4}
+            colorScheme="teal"
+            isLoading={props.isSubmitting}
+            type="submit"
+          >
+            Submit
+          </Button>
+        </Form>
+      )}
+    </Formik>
+  );
+}

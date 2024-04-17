@@ -21,7 +21,7 @@ const SuggestionItem = ({ doc, setDoc }) => {
         fontWeight={"bold"}
         cursor={"default"}
       >
-        {doc}
+        {doc.name}
       </Text>
     </Box>
   );

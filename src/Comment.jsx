@@ -1,26 +1,28 @@
-import { Avatar, Box, HStack, Icon, Text } from "@chakra-ui/react";
-import { FiThumbsUp, FiThumbsDown } from "react-icons/fi";
-
-const Comment = ({ comment }) => {
+import { Avatar, Box, HStack, Text } from "@chakra-ui/react";
+import { Rating } from "react-simple-star-rating";
+const Comment = ({ review }) => {
+  console.log(`review: `, review);
   return (
-    <Box className="comment" px={6} borderY={"1px"}>
+    <Box className="comment" px={12} my={2}>
       <HStack>
         <Avatar size={"sm"}></Avatar>
-        <Text fontWeight={"medium"}>{comment.name}</Text>
+        <Text fontWeight={"medium"}>{review.reviewer.username}</Text>
       </HStack>
-      <Text className="comment" textAlign={"start"} fontSize={"sm"} py={0}>
-        {comment.body}
+      <Text fontSize={"sm"}>
+        Reviewed on {new Date(review.createdAt).toLocaleDateString()}
       </Text>
-      <HStack justifyContent={"flex-end"}>
-        <HStack>
-          <Icon as={FiThumbsUp} />
-          <Text fontSize={"sm"}>0</Text>
-        </HStack>
-        <HStack>
-          <Icon as={FiThumbsDown} />
-          <Text fontSize={"sm"}>0</Text>
-        </HStack>
+      <HStack>
+        <Rating
+          initialValue={review.rating}
+          size={20}
+          readonly={true}
+          allowFraction={true}
+        />
+        <Text className="comment" textAlign={"start"} py={0}>
+          {review.comment}
+        </Text>
       </HStack>
+      <HStack justifyContent={"flex-end"}></HStack>
     </Box>
   );
 };

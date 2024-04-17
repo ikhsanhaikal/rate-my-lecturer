@@ -2,7 +2,15 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 
 import {
   Avatar,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogCloseButton,
+  AlertDialogFooter,
   Box,
+  Button,
   Divider,
   Flex,
   Heading,
@@ -15,11 +23,9 @@ import {
 } from "@chakra-ui/react";
 
 import Comment from "./Comment";
-import Stars from "./Stars";
 import React, { useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
-import data from "./db.json";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import ReviewModal from "./ReviewModal";
 
@@ -27,19 +33,7 @@ import { useBoundStore } from "./useBoundStore";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 
-function getLecturer(lecturerId) {
-  const { lecturers } = data;
-  const lecturer = lecturers.find(
-    (lecturer) => lecturer.id === parseInt(lecturerId)
-  );
-  return lecturer;
-}
-
-export function loader({ params }) {
-  const lecturer = getLecturer(params.lecturerId);
-  return { lecturer };
-}
-
+import { Rating } from "react-simple-star-rating";
 const GET_LECTURER = gql`
   query GET_LECTURER($lecturerId: Int!) {
     lecturer(id: $lecturerId) {
@@ -47,30 +41,41 @@ const GET_LECTURER = gql`
       name
       email
       lab {
+        id
         name
-        code
       }
       tags {
         id
         name
       }
+      rating
       subjects {
         id
         name
+      }
+      reviews {
+        id
+        reviewer {
+          id
+          username
+          email
+        }
+        comment
+        rating
+        createdAt
       }
     }
   }
 `;
 
 const ADD_REVIEW = gql`
-  mutation Mutation($input: reviewinput!) {
-    reviewCreate(input: $input) {
+  mutation ADD_REVIEW($reviewInput: ReviewInput!) {
+    addReview(reviewInput: $reviewInput) {
       reviewer {
         username
         id
       }
       comment
-      rate
       course {
         id
         subject {
@@ -88,14 +93,35 @@ const ADD_REVIEW = gql`
   }
 `;
 
-const Lecturer = () => {
+const Lecturer = ({ doc }) => {
   const { lecturerId } = useParams();
   const { loading, error, data } = useQuery(GET_LECTURER, {
-    variables: { lecturerId: parseInt(lecturerId) },
+    variables: { lecturerId: parseInt(lecturerId ?? doc.id) },
   });
+  const logout = useBoundStore((state) => state.logout);
 
-  const [addReview, { dataReview, loadingAddReview, errorAddReview }] =
-    useMutation(ADD_REVIEW);
+  const alertProps = useDisclosure();
+  const [addReview, result] = useMutation(ADD_REVIEW, {
+    refetchQueries: [
+      { query: GET_LECTURER, variables: { lecturerId: parseInt(lecturerId) } },
+    ],
+    onCompleted: () => {
+      onClose();
+    },
+    onError: (error) => {
+      if (
+        error.graphQLErrors
+          .map((err) => err.extensions.code)
+          .find((code) => {
+            return code === "FORBIDDEN";
+          })
+      ) {
+        alertProps.onOpen();
+      }
+      console.log("error general");
+      console.log("error: ", error);
+    },
+  });
 
   const user = useBoundStore((state) => state.user);
   const login = useBoundStore((state) => state.login);
@@ -107,7 +133,7 @@ const Lecturer = () => {
       console.log(tokenResponse);
       try {
         const { status, data } = await axios.post(
-          "https://127.0.0.1:5050/verify",
+          "https://127.0.0.1:6060/verify",
           {
             code: tokenResponse.code,
           },
@@ -120,11 +146,12 @@ const Lecturer = () => {
         onClose();
       }
     },
-    onNonOAuthError: () => {
+    onNonOAuthError: (nonOAuthError) => {
+      console.log(`nonAuthOError: `, nonOAuthError);
       onClose();
     },
     onError: (errorResponse) => {
-      // console.log(errorResponse);
+      console.log(`onError: `, errorResponse);
       onClose();
     },
     flow: "auth-code",
@@ -140,19 +167,16 @@ const Lecturer = () => {
   }
 
   if (error) {
-    console.log(error);
     return <p>error...</p>;
   }
 
-  console.log(data);
-
   return (
     <Box bgColor="white" width="full" h="full" overflowY="scroll">
+      <AlertComponent disclosure={alertProps} logout={logout} />
       <Box className="profile-image" bg={"gray.200"} h={["200px", "300px"]}>
         <Flex px={4} py={4}>
           <IconButton
             icon={<ArrowBackIcon />}
-            // onClick={onClose}
             onClick={() => {
               navigate(-1);
             }}
@@ -167,7 +191,7 @@ const Lecturer = () => {
             {data.lecturer.name}
           </Heading>
           <Text textAlign={"start"} fontWeight={"semibold"}>
-            expertise {"\u2022"} {data.lecturer.lab.name}
+            expertise {"\u2022"} {data.lecturer.lab?.name}
           </Text>
           <Text
             textAlign={"start"}
@@ -176,16 +200,23 @@ const Lecturer = () => {
             fontSize={["sm", "md", "lg", "xl"]}
           ></Text>
           <HStack spacing={"2.5"} justifyContent={"flex-start"} pb={4}>
-            <Stars total={3} />
+            <Rating
+              initialValue={data.lecturer.rating}
+              size={30}
+              readonly={true}
+              allowFraction={true}
+            />
           </HStack>
           <Box textAlign={"start"}>
-            {data.lecturer.tags.map((tag) => {
-              return (
-                <Tag key={tag.id} m={0.5}>
-                  {tag.name}
-                </Tag>
-              );
-            })}
+            {data.lecturer.tags.length > 0
+              ? data.lecturer.tags.map((tag) => {
+                  return (
+                    <Tag key={tag.id} m={0.5}>
+                      {tag.name}
+                    </Tag>
+                  );
+                })
+              : "no tags yet"}
           </Box>
           <Divider py={2} />
           <Text
@@ -210,7 +241,7 @@ const Lecturer = () => {
         </Box>
         <Box>
           <Text textAlign={"start"} px={3}>
-            {/* Comments ({comments.length}) */}
+            Comments ({data.lecturer.reviews.length})
           </Text>
           <Flex alignItems="center" padding={3} columnGap={3} ref={finalRef}>
             <Avatar size={["xs", "sm"]}></Avatar>
@@ -219,10 +250,13 @@ const Lecturer = () => {
               borderRadius={"none"}
               bg={"white"}
               size={["sm", "md"]}
-              onFocus={onOpen}
+              onFocus={() => {
+                console.log("hello, world");
+                onOpen();
+              }}
               ref={inputCommentRef}
             />
-            {/* {user == null && isOpen ? (
+            {user == null && isOpen ? (
               (function () {
                 googleLogin();
                 inputCommentRef.current.blur();
@@ -233,24 +267,13 @@ const Lecturer = () => {
                 onClose={onClose}
                 finalRef={finalRef}
                 addReview={addReview}
+                lecturerId={data.lecturer.id}
               />
-            )} */}
-            <ReviewModal
-              isOpen={isOpen}
-              onClose={onClose}
-              finalRef={finalRef}
-              addReview={addReview}
-            />
+            )}
           </Flex>
-          {/* {comments.map((comment) => {
-            return (
-              <Comment
-                key={comment.id}
-                comment={comment}
-                updateComment={null}
-              />
-            );
-          })} */}
+          {data.lecturer.reviews.map((review) => {
+            return <Comment key={review.id} review={review} />;
+          })}{" "}
         </Box>
       </Box>
     </Box>
@@ -258,3 +281,36 @@ const Lecturer = () => {
 };
 
 export default Lecturer;
+
+function AlertComponent({ disclosure, logout }) {
+  return (
+    <AlertDialog
+      motionPreset="slideInBottom"
+      onClose={() => {
+        logout();
+        disclosure.onClose();
+      }}
+      isOpen={disclosure.isOpen}
+      isCentered
+    >
+      <AlertDialogOverlay />
+      <AlertDialogContent>
+        <AlertDialogHeader>Session has expired</AlertDialogHeader>
+        <AlertDialogCloseButton />
+        <AlertDialogBody>please sign in again to continue</AlertDialogBody>
+        <AlertDialogFooter>
+          <Button
+            colorScheme="green"
+            ml={3}
+            onClick={() => {
+              disclosure.onClose();
+              logout();
+            }}
+          >
+            Sign In
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}

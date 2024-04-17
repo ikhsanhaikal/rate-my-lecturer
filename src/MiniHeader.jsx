@@ -22,33 +22,52 @@ import {
 } from "@chakra-ui/react";
 
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { BsFilterRight } from "react-icons/bs";
 import TagList from "./TagList";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useBoundStore } from "./useBoundStore";
+import { useQuery, gql } from "@apollo/client";
 
 axios.defaults.withCredentials = true;
 
+const GET_SUBJECTS_CHARACTERS = gql`
+  query GET_SUBJECTS_CHARACTERS {
+    subjects: subjects {
+      id
+      name
+    }
+    characters: characters {
+      id
+      name
+    }
+  }
+`;
 const MiniHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const user = useBoundStore((state) => state.user);
   const login = useBoundStore((state) => state.login);
   const logout = useBoundStore((state) => state.logout);
 
+  const { loading, data } = useQuery(GET_SUBJECTS_CHARACTERS, {
+    onCompleted: (data) => {},
+
+    onError: (error) => {},
+  });
+
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       console.log(tokenResponse);
       try {
         const { status, data } = await axios.post(
-          "https://127.0.0.1:5050/verify",
+          "https://127.0.0.1:6060/verify",
           {
             code: tokenResponse.code,
           },
           { withCredentials: true }
         );
-        console.log(data, status);
+        console.log(`data google: `, data);
         console.log("call login");
         login(data);
       } catch (error) {
@@ -92,11 +111,11 @@ const MiniHeader = () => {
                 Sign In
               </MenuItem>
             ) : (
-              <MenuGroup title={user.email}>
+              <MenuGroup title={user?.email ?? "unknown"}>
                 <MenuItem
                   onClick={async () => {
                     console.log("Oucch");
-                    await axios.post("https://127.0.0.1:5050/terminate", {
+                    await axios.post("https://127.0.0.1:6060/logout", {
                       withCredentials: true,
                     });
                     logout();
@@ -110,7 +129,7 @@ const MiniHeader = () => {
         </Menu>
         <Show breakpoint="(max-width: 720px)">
           <Icon as={BsFilterRight} fontSize={"3xl"} onClick={onOpen} />
-          <DrawerFilter isOpen={isOpen} onClose={onClose} />
+          <DrawerFilter isOpen={isOpen} onClose={onClose} data={data} />
         </Show>
       </Flex>
     </Box>
@@ -119,26 +138,15 @@ const MiniHeader = () => {
 
 export default MiniHeader;
 
-function DrawerFilter({ onClose, isOpen }) {
+function DrawerFilter({ onClose, isOpen, data }) {
   const btnRef = useRef();
-  const tags = [
-    "auto lulus",
-    "auto ngulang",
-    "santuy",
-    "gaje",
-    "bolosan",
-    "tugasan",
-    "presentasian",
-    "killer",
-  ];
-  const subjects = [
-    "linear algebra",
-    "dasar pemrograman",
-    "jaringan komputer",
-    "sistem operasi",
-    "data mining",
-    "pemrograman berbasis objek",
-  ];
+  const setGender = useBoundStore((state) => state.setGender);
+  const setSubjects = useBoundStore((state) => state.setSubjects);
+  const setTraits = useBoundStore((state) => state.setTraits);
+  const gender = useBoundStore((state) => state.gender);
+  const subjects = useBoundStore((state) => state.subjects);
+  const traits = useBoundStore((state) => state.traits);
+
   return (
     <Drawer
       isOpen={isOpen}
@@ -154,6 +162,7 @@ function DrawerFilter({ onClose, isOpen }) {
             _focus={{ boxShadow: "none" }}
             p={1}
             colorScheme={"blue"}
+            visibility={"hidden"}
           >
             Apply
           </Button>
@@ -174,14 +183,64 @@ function DrawerFilter({ onClose, isOpen }) {
             <Box>
               <Text fontWeight={"bold"} pl={1} pb={1} fontSize={["xs", "sm"]}>
                 Subjects
-              </Text>
-              <TagList tags={subjects} />
+              </Text>{" "}
+              {data?.subjects !== undefined ? (
+                <TagList
+                  tags={data.subjects}
+                  setter={(id) => {
+                    if (subjects?.includes(id)) {
+                      const result = subjects.filter((arg) => arg !== id);
+                      setSubjects(result.length > 0 ? result : null);
+                    } else {
+                      setSubjects(subjects !== null ? [...subjects, id] : [id]);
+                    }
+                  }}
+                  selected={subjects}
+                />
+              ) : (
+                <>world class loading design..</>
+              )}
             </Box>
             <Box>
               <Text fontWeight={"bold"} pl={1} pb={1} fontSize={["xs", "sm"]}>
                 Tags
               </Text>
-              <TagList tags={tags} />
+              {data?.characters !== undefined ? (
+                <TagList
+                  tags={data.characters}
+                  setter={(id) => {
+                    if (traits?.includes(id)) {
+                      const result = traits.filter((arg) => arg !== id);
+                      setTraits(result.length > 0 ? result : null);
+                    } else {
+                      setTraits(traits !== null ? [...traits, id] : [id]);
+                    }
+                  }}
+                  selected={traits}
+                />
+              ) : (
+                <>loading</>
+              )}
+            </Box>
+            <Box>
+              <Text fontWeight={"bold"} pl={1} pb={1} fontSize={["xs", "sm"]}>
+                Gender
+              </Text>
+              <TagList
+                tags={[
+                  { id: 1, name: "male" },
+                  { id: 2, name: "female" },
+                ]}
+                setter={(id) => {
+                  if (gender !== null && gender.includes(id)) {
+                    setGender(null);
+                  } else {
+                    setGender(id);
+                  }
+                }}
+                selected={gender}
+                radio={true}
+              />
             </Box>
           </VStack>
         </DrawerBody>

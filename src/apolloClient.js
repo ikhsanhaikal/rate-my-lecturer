@@ -17,14 +17,26 @@ const BASE_URL =
 
 export const apolloClient = new ApolloClient({
   uri: `${BASE_URL}/graphql`,
+  credentials: "include",
   cache: new InMemoryCache({
     typePolicies: {
+      lecturer: ["id", "email", "name"],
       Query: {
         fields: {
           lecturers: {
-            keyArgs: false,
+            keyArgs: (args, context) => {
+              //console.log(`args: `, args);
+              //console.log(
+              //`gender:${args.gender}:subjects:${JSON.stringify(
+              //args.subjects
+              //)}`
+              //);
+              //console.log(`args: `, args);
+              return `gender:${args.filter.gender}:subjects:${JSON.stringify(
+                args.filter.subjects
+              )}characters:${args.filter.characters}`;
+            },
             merge(existing, incoming, { args: { cursorId }, readField }) {
-              console.log(`merge function cursorId: `, cursorId);
               const merged = existing ? existing.slice(0) : [];
               let offset = offsetFromCursor(merged, cursorId, readField);
               if (offset < 0) offset = merged.length;
