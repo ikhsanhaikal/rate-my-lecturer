@@ -71,8 +71,8 @@ const MiniSearch = ({ setOnFocus }) => {
     }
   }, [value]);
 
-  console.log("data: ", data?.search.data);
-  console.log("doc: ", doc);
+  // console.log("data: ", data?.search.data);
+  // console.log("doc: ", doc);
   return (
     <>
       <Box h="full" px={4} py={4}>
@@ -96,7 +96,7 @@ const MiniSearch = ({ setOnFocus }) => {
             autoFocus={true}
             value={textInput}
             onChange={(e) => {
-              console.log(`searching for : ${e.target.value}`);
+              // console.log(`searching for : ${e.target.value}`);
               setTextInput(e.target.value);
             }}
           />

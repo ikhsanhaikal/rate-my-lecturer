@@ -31,7 +31,10 @@ import { useBoundStore } from "./useBoundStore";
 import { useQuery, gql } from "@apollo/client";
 
 axios.defaults.withCredentials = true;
-
+const BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? process.env.REACT_APP_DEV_API
+    : process.env.REACT_APP_PROD_API;
 const GET_SUBJECTS_CHARACTERS = gql`
   query GET_SUBJECTS_CHARACTERS {
     subjects: subjects {
@@ -61,21 +64,22 @@ const MiniHeader = () => {
       console.log(tokenResponse);
       try {
         const { status, data } = await axios.post(
-          "https://127.0.0.1:6060/verify",
+          `${BASE_URL}/verify`,
           {
             code: tokenResponse.code,
           },
           { withCredentials: true }
         );
-        console.log(`data google: `, data);
-        console.log("call login");
+        // console.log(`data google: `, data);
+        // console.log("call login");
         login(data);
       } catch (error) {
-        console.error(error);
+        // console.error(error);
+        throw error;
       }
     },
     onError: (errorResponse) => {
-      console.log(errorResponse);
+      // console.log(errorResponse);
     },
     flow: "auth-code",
   });
@@ -114,8 +118,8 @@ const MiniHeader = () => {
               <MenuGroup title={user?.email ?? "unknown"}>
                 <MenuItem
                   onClick={async () => {
-                    console.log("Oucch");
-                    await axios.post("https://127.0.0.1:6060/logout", {
+                    // console.log("Oucch");
+                    await axios.post(`${BASE_URL}/logout`, {
                       withCredentials: true,
                     });
                     logout();

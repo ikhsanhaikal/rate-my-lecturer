@@ -92,6 +92,10 @@ const ADD_REVIEW = gql`
     }
   }
 `;
+const BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? process.env.REACT_APP_DEV_API
+    : process.env.REACT_APP_PROD_API;
 
 const Lecturer = ({ doc }) => {
   const { lecturerId } = useParams();
@@ -118,8 +122,8 @@ const Lecturer = ({ doc }) => {
       ) {
         alertProps.onOpen();
       }
-      console.log("error general");
-      console.log("error: ", error);
+      // console.log("error general");
+      // console.log("error: ", error);
     },
   });
 
@@ -133,25 +137,25 @@ const Lecturer = ({ doc }) => {
       console.log(tokenResponse);
       try {
         const { status, data } = await axios.post(
-          "https://127.0.0.1:6060/verify",
+          `${BASE_URL}/verify`,
           {
             code: tokenResponse.code,
           },
           { withCredentials: true }
         );
-        console.log(data, status);
-        console.log("call login");
+        // console.log(data, status);
+        // console.log("call login");
         login(data);
       } catch (error) {
         onClose();
       }
     },
     onNonOAuthError: (nonOAuthError) => {
-      console.log(`nonAuthOError: `, nonOAuthError);
+      // console.log(`nonAuthOError: `, nonOAuthError);
       onClose();
     },
     onError: (errorResponse) => {
-      console.log(`onError: `, errorResponse);
+      // console.log(`onError: `, errorResponse);
       onClose();
     },
     flow: "auth-code",

@@ -160,7 +160,8 @@ function FormForReview({ data, addReview }) {
               {data.lecturer.courses.map((c) => {
                 return (
                   <option key={c.id} data-key={c.id}>
-                    {c.subject.name}, {c.year}, {c.semester}
+                    {c.subject.name}, {new Date(c.year).getFullYear()},{" "}
+                    {c.semester}
                   </option>
                 );
               })}

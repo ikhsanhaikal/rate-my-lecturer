@@ -1,7 +1,6 @@
 import { Avatar, Box, HStack, Text } from "@chakra-ui/react";
 import { Rating } from "react-simple-star-rating";
 const Comment = ({ review }) => {
-  console.log(`review: `, review);
   return (
     <Box className="comment" px={12} my={2}>
       <HStack>
